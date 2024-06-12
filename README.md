@@ -30,8 +30,8 @@ The development of this compiler project mirrors the progression outlined in *Mo
 
 ### Technologies
 - Java: A programming language for compiler development
-- JFex: Tool for building lexical analyzers
-- CUP2: Parser generator for constructing parse trees
+- [JFex] (https://jflex.de/): Tool for building lexical analyzers
+- [CUP] (http://www2.cs.tum.edu/projects/cup/index.php): Parser generator for constructing parse trees 
 - NIOS II Processor: Target architecture for code generation. For further details, refer to the [Intel Nios II Reference Manual](https://cdrdv2-public.intel.com/666887/n2cpu-nii5v1-683836-666887.pdf)
 - Modern Compiler Implementation in Java (Textbook): Reference material for compiler design and implementation
 
@@ -41,7 +41,7 @@ The compiler project can be cloned and built using standard Java development too
 ### TODO
 The project progress aligns with the stages of compiler construction, with each phase representing a milestone in the development of the Tiger compiler.
 
-- [ ] Phase 1: Lexical Analysis (WIP)
+- [ ] Phase 1: Lexical Analysis
 - [ ] Phase 2: Parsing (Constructing Parse Trees)
 - [ ] Phase 3: Type Checking
 - [ ] Phase 4: Stack Allocation and Parameter Passing
