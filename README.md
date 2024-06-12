@@ -42,7 +42,7 @@ The compiler project can be cloned and built using standard Java development too
 The project progress aligns with the stages of compiler construction, with each phase representing a milestone in the development of the Tiger compiler.
 
 - [x] Phase 1: Lexical Analysis
-- [ ] Phase 2: Parsing (Constructing Parse Trees)
+- [x] Phase 2: Parsing (Constructing Parse Trees)
 - [ ] Phase 3: Type Checking
 - [ ] Phase 4: Stack Allocation and Parameter Passing
 - [ ] Phase 5: Intermediate Representation Generation
