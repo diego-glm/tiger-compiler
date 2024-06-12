@@ -1,0 +1,9 @@
+To build the lexer in flex:
+    Use argument: src/Parse/tiger-lang.flex
+To build the grammer in cup:
+    Use the arguments: -destdir src/Parse/ -parser Grammar -expect 3 -nonterms src/Parse/tiger-grammar.cup
+
+To run the Lexer on one file,
+   Use Parse.MainToken with argument test_cases/input/custom.tig
+To run the Parser on one file,
+   Use Parse.MainParseTree with argument test_cases/input/custom.tig
