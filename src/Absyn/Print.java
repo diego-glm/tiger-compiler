@@ -3,8 +3,14 @@ package Absyn;
 public class Print {
 
   java.io.PrintWriter out;
+  private Types.Print types;
+  private Semant.Print semant;
 
-  public Print(java.io.PrintWriter o) { out = o; }
+  public Print(java.io.PrintWriter o) {
+    out=o;
+    types = new Types.Print(o);
+    semant = new Semant.Print(o);
+  }
 
   void indent(int d) {
     for(int i=0; i<d; i++)
@@ -171,6 +177,9 @@ public class Print {
     else if (e instanceof LetExp) prExp((LetExp) e, d);
     else if (e instanceof ArrayExp) prExp((ArrayExp) e, d);
     else throw new Error("Print.prExp");
+    if (e.type != null) {
+      sayln(""); indent(d); say(":"); types.prType(e.type, d+1);
+    }
   }
 
   void prDec(FunctionDec d, int i) {
@@ -185,6 +194,9 @@ public class Print {
       indent(i+1); prDec(d.next, i+1);
     }
     say(")");
+    if (d != null && d.entry != null) {
+      sayln(""); indent(i); semant.prEntry(d.entry, i);
+    }
   }
 
   void prDec(VarDec d, int i) {
@@ -194,6 +206,9 @@ public class Print {
     }
     prExp(d.init, i+1); sayln(",");
     indent(i+1); say(d.escape); say(")");
+    if (d.entry != null) {
+      sayln(""); indent(i); semant.prEntry(d.entry, i);
+    }
   }
 
   void prDec(TypeDec d, int i) {
@@ -204,6 +219,9 @@ public class Print {
         sayln(","); indent(i+1); prDec(d.next, i+1);
       }
       say(")");
+      if (d.entry != null) {
+        sayln(""); indent(i); say("="); types.prType(d.entry, i+1);
+      }
     }
   }
 

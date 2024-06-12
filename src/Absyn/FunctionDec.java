@@ -6,8 +6,10 @@ public class FunctionDec extends Dec {
   public NameTy result;		/* optional */
   public Exp body;
   public FunctionDec next;
-  public FunctionDec(int p, Symbol n, FieldList a, NameTy r, Exp b, FunctionDec x) {
+  public FunctionDec(int p, Symbol n, FieldList a, NameTy r, Exp b,
+      FunctionDec x) {
     pos=p; name=n; params=a; result=r; body=b; next=x;
   }
   public boolean leaf = false;
+  public Semant.FunEntry entry;
 }
