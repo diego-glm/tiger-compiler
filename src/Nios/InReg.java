@@ -7,6 +7,10 @@ class InReg extends Frame.Access {
     temp = t;
   }
 
+  public Tree.Exp exp(Tree.Exp fp) {
+    return new Tree.TEMP(temp);
+  }
+
   public String toString() {
     return temp.toString();
   }
