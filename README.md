@@ -46,7 +46,7 @@ The project progress aligns with the stages of compiler construction, with each 
 - [x] Phase 3: Type Checking
 - [x] Phase 4: Stack Allocation and Parameter Passing
 - [x] Phase 5: Intermediate Representation Generation
-- [ ] Phase 6: Code Generation (NIOS II Assembly)
+- [x] Phase 6: Code Generation (NIOS II Assembly)
 
 
 ### Deviations
