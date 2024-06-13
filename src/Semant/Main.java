@@ -1,10 +1,11 @@
 package Semant;
+import java.io.IOException;
 import java.io.PrintWriter;
 import Parse.Parse;
 
 public class Main {
 
-  public static void main(String argv[])  {
+  public static void main(String argv[]) throws IOException {
     for (int i = 0; i < argv.length; ++i) {
       String filename = argv[i];
       if (argv.length > 1)
