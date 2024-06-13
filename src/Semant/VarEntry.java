@@ -8,4 +8,3 @@ public class VarEntry extends Entry {
     acc = access;
   }
 }
-}
