@@ -44,7 +44,7 @@ The project progress aligns with the stages of compiler construction, with each 
 - [x] Phase 1: Lexical Analysis
 - [x] Phase 2: Parsing (Constructing Parse Trees)
 - [x] Phase 3: Type Checking
-- [ ] Phase 4: Stack Allocation and Parameter Passing
+- [x] Phase 4: Stack Allocation and Parameter Passing
 - [ ] Phase 5: Intermediate Representation Generation
 - [ ] Phase 6: Code Generation (NIOS II Assembly)
 
