@@ -3,17 +3,22 @@ import Translate.Exp;
 import Types.Type;
 import Symbol.Symbol;
 import java.util.Hashtable;
+import Translate.Level;
 
 public class Semant {
     Env env;
-    public Semant(ErrorMsg.ErrorMsg err) {
-        this(new Env(err));
+    Level level;
+    public Semant(Frame.Frame frame, ErrorMsg.ErrorMsg err) {
+        this(new Env(err), new Level(frame));
     }
-    Semant(Env e) {
+    Semant(Env e, Level l) {
         env = e;
+        level = l;
     }
 
     public void transProg(Absyn.Exp exp) {
+        new FindEscape.FindEscape(exp);
+        level = new Level(this.level, Symbol.symbol("tigermain"), null);
         transExp(exp);
     }
 
@@ -30,7 +35,6 @@ public class Semant {
     static final Types.INT    INT    = new Types.INT();
     static final Types.STRING STRING = new Types.STRING();
     static final Types.NIL    NIL    = new Types.NIL();
-    static final Types.INT    LOOPVAR = new Types.INT(); // Temporary
 
     /** Check if two types are the same, using the in_this coerceTo to_that logic */
     private void checkSame(Type is_this, Type to_that, int pos, String msg) {
@@ -91,7 +95,7 @@ public class Semant {
 
     /**Check if the entry is the loop variable and inside the loop*/
     private boolean isForVarLoop(VarEntry entry, boolean loop, int pos) {
-        boolean is_it = (entry.ty == LOOPVAR) && loop;
+        boolean is_it = (loop && entry instanceof LoopVarEntry);
         if (is_it)
             error(pos, "assignment to loop index");
         return is_it;
@@ -306,8 +310,8 @@ public class Semant {
 
     ExpTy transExp(Absyn.WhileExp e) {
         ExpTy testt = transExp(e.test);
-        ExpTy bodyt = transExp(e.body);
-
+        Semant loop = new LoopSemant(env, level);
+        ExpTy bodyt = loop.transExp(e.body);
         checkInt(testt, e.test.pos);
         checkMustBeVOID(bodyt.ty, e.body.pos);
 
@@ -323,8 +327,10 @@ public class Semant {
 
         env.venv.beginScope();
 
-        e.var.entry = new VarEntry(LOOPVAR); // Per manual, the loop var cannot be alter inside loop
+        Translate.Access acc = level.allocLocal(e.var.escape);
+        e.var.entry = new LoopVarEntry(INT, acc);
         env.venv.put(e.var.name, e.var.entry);
+        Semant loop = new LoopSemant(env, level);
 
         ExpTy body = transExp(e.body);
 
@@ -378,7 +384,8 @@ public class Semant {
             type = transTy(d.typ);
             checkSame(init.ty, type, d.pos, "assignment type mismatch");
         }
-        d.entry = new VarEntry(type);
+        Translate.Access acc = level.allocLocal(d.escape);
+        d.entry = new VarEntry(type, acc);
         env.venv.put(d.name, d.entry);
         return null;
     }
@@ -392,18 +399,19 @@ public class Semant {
             Types.RECORD fields = transTypeFields(new Hashtable<>(), f.params);
             Type type = transTy(f.result);
 
-            f.entry = new FunEntry(fields, type);
-            this.env.venv.put(f.name, f.entry);
+            Level l = new Level(level, f.name, helperEscapes(f.params), f.leaf);
+            f.entry = new FunEntry(l, fields, type);
+            env.venv.put(f.name, f.entry);
         }
 
         for (Absyn.FunctionDec f = d; f != null; f = f.next) {
             this.env.venv.beginScope();
-            putEnvLinkedList(f.entry.formals);
-            Semant fun = new Semant(this.env);
+            putEnvLinkedList(f.entry.formals, f.entry.level.formals);
+            Semant fun = new Semant(env, f.entry.level);
             ExpTy body = fun.transExp(f.body);
             if (!body.ty.coerceTo(f.entry.result))
                 error(f.body.pos, "result type mismatch");
-            this.env.venv.endScope();
+            env.venv.endScope();
         }
         return null;
     }
@@ -476,6 +484,12 @@ public class Semant {
         return VOID;
     }
 
+    private Utils.BoolList helperEscapes(Absyn.FieldList lst) {
+        if (lst == null)
+            return null;
+        return new Utils.BoolList(lst.escape, helperEscapes(lst.tail));
+    }
+
     /** Helper */
     private void transArgs(int pos, Types.RECORD rec, Absyn.ExpList lst) {
         if (rec == null) {
@@ -515,11 +529,11 @@ public class Semant {
     }
 
     /** Helper */
-    private void putEnvLinkedList(Types.RECORD f) {
-        if (f != null) {
-            this.env.venv.put(f.fieldName, new VarEntry(f.fieldType));
-            putEnvLinkedList(f.tail);
-        }
+    private void putEnvLinkedList(Types.RECORD f, Translate.AccessList lst) {
+        if (f == null)
+            return;
+        env.venv.put(f.fieldName, new VarEntry(f.fieldType, lst.head));
+        putEnvLinkedList(f.tail, lst.tail);
     }
 
     /** Helper */
@@ -532,5 +546,15 @@ public class Semant {
             return new Types.RECORD(f.name, name, transTypeFields(table, f.tail));
         }
         return null;
+    }
+}
+
+class LoopSemant extends Semant {
+    LoopSemant(Env e, Level l) {
+        super(e, l);
+    }
+
+    ExpTy transExp(Absyn.BreakExp e) {
+        return new ExpTy(null, VOID);
     }
 }
